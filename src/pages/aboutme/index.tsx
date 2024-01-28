@@ -1,51 +1,106 @@
 import Image from "next/image";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import aboutMeImage from "../../../public/me.jpeg";
 import { GlobalContext, InitialContext } from "@/context/GlobalContext";
 import Inner from "@/components/Layout/Inner";
-import { motion } from "framer-motion";
+import {
+	AnimatePresence,
+	motion,
+	stagger,
+	useAnimate,
+	useInView,
+	usePresence,
+} from "framer-motion";
 
 function AboutMe() {
 	const { darkMode } = useContext(GlobalContext) as InitialContext;
+	const [imageAnimComplete, setImageAnimComplete] = useState(false);
+	const contentRef = useRef<HTMLDivElement>(null);
+	const paragraphRef = useRef<HTMLDivElement>(null);
+	const isInView = useInView(paragraphRef, { root: contentRef, once: true });
+	const [scope, animate] = useAnimate();
+	const [isPresent, safeToRemove] = usePresence();
 
+	const imageAnimFinish = (e: any) => {
+		setImageAnimComplete(true);
+	};
+
+	useEffect(() => {
+		const enterAnimations = async () => {
+			console.log(isInView, isPresent);
+			if (isPresent) {
+				await animate(
+					"h1",
+					{
+						x: [-200, 0],
+						opacity: [0, 1],
+					},
+					{ delay: stagger(0.2) }
+				);
+			} else {
+				safeToRemove();
+			}
+		};
+
+		enterAnimations();
+	}, [isInView, isPresent]);
 	return (
 		<Inner>
 			<div
+				ref={scope}
 				className={`${
 					darkMode ? "bg-black-1" : "bg-light "
-				} flex items-center p-8`}
+				} flex h-screen items-center p-8 justify-center`}
 			>
-				<motion.div
-					initial={{
-						y: 200,
-						opacity: 0,
-					}}
-					animate={{
-						y: 0,
-						opacity: 1,
-					}}
-					whileHover={{}}
-					transition={{ delay: 0.2 }}
-				>
-					<Image
-						src={aboutMeImage}
-						alt="Me"
-						className="mt-16  rounded-xl border-light border-2"
-						width={500}
-					/>
-				</motion.div>
+				<div className="relative w-[500px] flex p-8  justify-center overflow-scroll no-scrollbar">
+					<AnimatePresence>
+						{!imageAnimComplete && (
+							<motion.div
+								key="imageUnderline"
+								initial={{ width: "0%" }}
+								animate={{ width: "100%" }}
+								exit={{ width: "0%" }}
+								transition={{ duration: 0.2 }} // Adjust duration as needed
+								className="absolute bottom-0 z-10 self-center h-[1px] bg-light"
+							></motion.div>
+						)}
+					</AnimatePresence>
+					<motion.div
+						initial={{
+							y: 600,
+						}}
+						animate={{
+							y: 0,
+						}}
+						whileHover={{}}
+						transition={{ delay: 0.2, duration: 1, type: "spring" }}
+						// onTransitionEnd={() => {
+						// 	console.log("hello");
+						// }}
+						onAnimationComplete={imageAnimFinish}
+						className="relative flex items-center w-[95%]"
+					>
+						<Image
+							src={aboutMeImage}
+							alt="Me"
+							className=" rounded-xl border-light border-2"
+						/>
+					</motion.div>
+				</div>
+
 				<div
-					className={`text-xl text-light ${
-						darkMode ? "text-light" : "text-black-1"
-					} "flex w-1/2 p-4 mx-16 my-16 text-left h-fit "`}
+					id="content"
+					ref={contentRef}
+					className="text-xl space-y-6 text-light flex flex-col p-4 h-fit w-1/2 mx-16 text-left "
 				>
+					<h1 className="text-6xl font-semibold">Hi there!</h1>
 					<h1 className={`my-5 ${!darkMode && "text-black-2"}`}>
-						Hi there! My name is Ido and I am a self-proclaimed tech-nerd and
-						lover of all things innovative. Based in Israel, I have been
-						fascinated with technology from a young age and my passion has only
-						continued to grow. I am a lifelong learner, with a love for science
-						and an insatiable curiosity about how things work. This drive led me
-						to complete an intensive full-stack bootcamp at ITC (Israel Tech
+						My name is Ido and I am a self-proclaimed tech-nerd and lover of all
+						things innovative. Based in Israel, I have been fascinated with
+						technology from a young age and my passion has only continued to
+						grow. I am a lifelong learner, with a love for science and an
+						insatiable curiosity about how things work. This drive led me to
+						complete an intensive full-stack bootcamp at ITC (Israel Tech
 						Challenge), where I honed my skills in coding and software
 						development, and have since been working as a dev team manager at
 						Partner for the past 4 years, on a product in the call centers and

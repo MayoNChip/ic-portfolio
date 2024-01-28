@@ -1,6 +1,5 @@
 "use client";
-import { motion, useAnimate, Variants } from "framer-motion";
-import { useEffect } from "react";
+import { motion, Variants } from "framer-motion";
 function Inner({ children }: { children: React.ReactNode }) {
 	const anim = (variants: Variants) => {
 		return {
@@ -41,14 +40,17 @@ function Inner({ children }: { children: React.ReactNode }) {
 		enter: { opacity: 1 },
 		exit: { opacity: 0 },
 	};
+
 	return (
 		<div className="relative w-full h-full">
 			<motion.div
+				id="firstSlide"
 				className="bg-accent absolute top-0 w-full h-full z-10"
 				{...anim(firstSlide)}
 			/>
+
 			<motion.div
-				id="secondCard"
+				id="secondSlide"
 				className="bg-black-1 absolute top-0 w-full h-full z-10"
 				{...anim(secondSlide)}
 			/>

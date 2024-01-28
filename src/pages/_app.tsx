@@ -7,7 +7,7 @@ import type { AppProps } from "next/app";
 
 export default function App({ Component, pageProps, router }: AppProps) {
 	return (
-		<div className="relative flex flex-col items-center w-full h-screen overflow-y-hidden bg-black-1">
+		<div className="relative flex flex-col items-center w-full h-screen overflow-hidden bg-black-1">
 			<ThemeProvider>
 				<Navbar />
 				<AnimatePresence mode="wait">

@@ -34,6 +34,7 @@ type Route = (typeof defaultRoutes)[0];
 function useNav() {
 	const [routes, setRoutes] = useState<Route[]>(defaultRoutes);
 	const [activeRoute, setActiveRoute] = useState<Route>(defaultRoutes[0]);
+
 	const router = useRouter();
 	const pathname = usePathname() as
 		| "/aboutme"
@@ -53,11 +54,23 @@ function useNav() {
 				router.push("/");
 				return;
 			}
-
 			setActiveRoute(nextRoute);
 
 			console.log("moving to page", nextRoute?.title);
 			router.push(nextRoute.path);
+		} else if (event.deltaY < 0) {
+			const prevRoute = defaultRoutes.filter(
+				(route) => route.id === activeRoute.id - 1
+			)[0];
+
+			if (activeRoute?.id <= 1) {
+				setActiveRoute(defaultRoutes[3]);
+				return router.push("/contactme");
+			}
+			setActiveRoute(prevRoute);
+
+			console.log("moving to page", prevRoute?.title);
+			router.push(prevRoute.path);
 		}
 	}, 400);
 
@@ -79,7 +92,11 @@ function useNav() {
 			window.removeEventListener("wheel", handleScroll);
 		};
 	}, [activeRoute, handleScroll]);
-	return { routes, activeRoute, setActiveRoute };
+	return {
+		routes,
+		activeRoute,
+		setActiveRoute,
+	};
 }
 
 export default useNav;
